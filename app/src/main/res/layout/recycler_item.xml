@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    app:cardBackgroundColor="@color/colorPrimary"
+    app:cardBackgroundColor="@color/colorPrimaryDark"
     app:cardCornerRadius="8dp"
     app:cardUseCompatPadding="true"
     app:contentPadding="8dp">
@@ -27,6 +28,7 @@
                 android:layout_weight="2"
                 android:gravity="center_vertical"
                 android:text="Repository"
+                android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
             <TextView
@@ -37,6 +39,7 @@
                 android:gravity="center|end"
                 android:text="25"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@android:color/white"
                 android:textSize="17sp" />
 
             <ImageView
@@ -46,7 +49,7 @@
                 android:layout_weight="0"
                 android:adjustViewBounds="false"
                 android:cropToPadding="false"
-                app:srcCompat="@mipmap/ic_favorite" />
+                app:srcCompat="@mipmap/ic_favorite_white" />
         </LinearLayout>
 
     </LinearLayout>

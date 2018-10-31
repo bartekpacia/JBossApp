@@ -1,7 +1,12 @@
 package baftek.pl.jbossapp;
 
 import android.content.Context;
+
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,14 +27,16 @@ public final class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecycler
 
     public class ViewHolder extends RecyclerView.ViewHolder
     {
+        CardView cardView;
         TextView textView_repoName;
-        //TextView textView_stars;
+        TextView textView_stars;
 
         public ViewHolder(View itemView)
         {
             super(itemView);
+            cardView = itemView.findViewById(R.id.cardView);
             textView_repoName = itemView.findViewById(R.id.textView_name);
-            //textView_stars = itemView.findViewById(R.id.textView_starCount);
+            textView_stars = itemView.findViewById(R.id.textView_starCount);
         }
     }
 
@@ -45,8 +52,21 @@ public final class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecycler
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position)
     {
+        final String url = repoDataList.get(position).getUrl();
+
+        holder.cardView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                context.startActivity(i);
+            }
+        });
         holder.textView_repoName.setText(repoDataList.get(position).getName());
-        //holder.textView_stars.setText(repoDataList.get(position).getStars());
+
+        //it needs to be converted to String, otherwise framework will try to use int as ResId and exception will be thrown
+        holder.textView_stars.setText(Integer.toString(repoDataList.get(position).getStars()));
     }
 
     @Override

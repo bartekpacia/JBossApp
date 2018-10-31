@@ -1,10 +1,15 @@
 package baftek.pl.jbossapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -23,6 +28,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "MainActivity";
+
+    private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private MyRecyclerViewAdapter adapter;
 
@@ -37,10 +44,12 @@ public class MainActivity extends AppCompatActivity
         repoDataList = new ArrayList<>();
         adapter = new MyRecyclerViewAdapter(this, repoDataList);
 
+        progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.recycler_view);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(adapter);
 
         String requestUrl = "https://api.github.com/orgs/JBossOutreach/repos";
@@ -57,7 +66,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onErrorResponse(VolleyError error)
             {
-                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "An error occured", Toast.LENGTH_LONG).show();
                 Log.e(TAG, error.getMessage());
             }
         });
@@ -68,7 +77,6 @@ public class MainActivity extends AppCompatActivity
     private void processResponse(String response)
     {
         Log.d(TAG, "Got response!");
-        Toast.makeText(MainActivity.this, "got", Toast.LENGTH_SHORT).show();
 
         JSONArray jsonArray;
         try
@@ -79,9 +87,10 @@ public class MainActivity extends AppCompatActivity
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
                 String repoName = jsonObject.getString("name");
+                String url = jsonObject.getString("html_url");
                 int stars = jsonObject.getInt("watchers");
 
-                RepoData data = new RepoData(repoName);
+                RepoData data = new RepoData(repoName, url, stars);
                 repoDataList.add(data);
                 adapter.notifyDataSetChanged();
             }
@@ -90,8 +99,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        Log.d(TAG, "Finished processResponse()");
-        Toast.makeText(MainActivity.this, "final success", Toast.LENGTH_SHORT).show();
-
+        progressBar.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
     }
 }
