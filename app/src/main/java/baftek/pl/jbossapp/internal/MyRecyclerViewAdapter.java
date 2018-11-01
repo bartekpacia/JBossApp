@@ -1,12 +1,13 @@
-package baftek.pl.jbossapp;
+package baftek.pl.jbossapp.internal;
 
 import android.content.Context;
 
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+import baftek.pl.jbossapp.R;
+import baftek.pl.jbossapp.RepositoryActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,21 +53,26 @@ public final class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecycler
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position)
     {
-        final String url = repoDataList.get(position).getUrl();
+        //for easier access
+        final RepoData repoData = repoDataList.get(position);
 
         holder.cardView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                Intent i = new Intent(context, RepositoryActivity.class);
+                i.putExtra("name", repoData.getName());
+                i.putExtra("url", repoData.getUrl());
+                i.putExtra("stars", repoData.getStars());
+                i.putExtra("description", repoData.getDescription());
                 context.startActivity(i);
             }
         });
         holder.textView_repoName.setText(repoDataList.get(position).getName());
 
         //it needs to be converted to String, otherwise framework will try to use int as ResId and exception will be thrown
-        holder.textView_stars.setText(Integer.toString(repoDataList.get(position).getStars()));
+        holder.textView_stars.setText(Integer.toString(repoData.getStars()));
     }
 
     @Override

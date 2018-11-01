@@ -6,6 +6,8 @@ import android.os.Bundle;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import baftek.pl.jbossapp.internal.MyRecyclerViewAdapter;
+import baftek.pl.jbossapp.internal.RepoData;
 
 import android.util.Log;
 import android.view.View;
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity
         adapter = new MyRecyclerViewAdapter(this, repoDataList);
 
         progressBar = findViewById(R.id.progressBar);
-        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recyclerView_repos);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
@@ -89,8 +91,9 @@ public class MainActivity extends AppCompatActivity
                 String repoName = jsonObject.getString("name");
                 String url = jsonObject.getString("html_url");
                 int stars = jsonObject.getInt("watchers");
+                String description = jsonObject.getString("description");
 
-                RepoData data = new RepoData(repoName, url, stars);
+                RepoData data = new RepoData(repoName, url, stars, description);
                 repoDataList.add(data);
                 adapter.notifyDataSetChanged();
             }
