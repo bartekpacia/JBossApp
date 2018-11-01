@@ -6,13 +6,15 @@ public class RepoData
     private String url;
     private int stars;
     private String description;
+    private String contributorsUrl;
 
-    public RepoData(String name, String url, int stars, String description)
+    public RepoData(String name, String url, int stars, String description, String contributorsUrl)
     {
         this.name = name;
         this.url = url;
         this.stars = stars;
         this.description = description;
+        this.contributorsUrl = contributorsUrl;
     }
 
     public String getName()
@@ -33,5 +35,10 @@ public class RepoData
     public String getDescription()
     {
         return description;
+    }
+
+    public String getContributorsUrl()
+    {
+        return contributorsUrl;
     }
 }

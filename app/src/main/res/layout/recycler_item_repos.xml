@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clickable="true"
     app:cardBackgroundColor="@color/colorPrimaryDark"
     app:cardCornerRadius="8dp"
     app:cardUseCompatPadding="true"
@@ -34,11 +36,11 @@
 
             <ImageView
                 android:id="@+id/imageView_star"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:adjustViewBounds="false"
                 android:cropToPadding="false"
-                app:srcCompat="@mipmap/ic_favorite_white" />
+                app:srcCompat="@mipmap/ic_star_white" />
 
             <TextView
                 android:id="@+id/textView_starCount"

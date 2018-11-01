@@ -6,12 +6,16 @@ import android.os.Bundle;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import baftek.pl.jbossapp.internal.MyRecyclerViewAdapter;
+import baftek.pl.jbossapp.internal.ReposRecyclerViewAdapter;
 import baftek.pl.jbossapp.internal.RepoData;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -31,9 +35,17 @@ public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "MainActivity";
 
-    private ProgressBar progressBar;
-    private RecyclerView recyclerView;
-    private MyRecyclerViewAdapter adapter;
+    String requestUrl = "https://api.github.com/orgs/JBossOutreach/repos";
+
+    @BindView(R.id.progressBar_repos)
+    ProgressBar progressBar;
+    @BindView(R.id.textView_error)
+    TextView textView_error;
+    @BindView(R.id.button_tryAgain)
+    Button button_tryAgain;
+    @BindView(R.id.recyclerView_repos)
+    RecyclerView recyclerView;
+    private ReposRecyclerViewAdapter adapter;
 
     private ArrayList<RepoData> repoDataList;
 
@@ -42,19 +54,34 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         repoDataList = new ArrayList<>();
-        adapter = new MyRecyclerViewAdapter(this, repoDataList);
-
-        progressBar = findViewById(R.id.progressBar);
-        recyclerView = findViewById(R.id.recyclerView_repos);
+        adapter = new ReposRecyclerViewAdapter(this, repoDataList);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
         recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
 
-        String requestUrl = "https://api.github.com/orgs/JBossOutreach/repos";
+        button_tryAgain.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                makeRequest();
+            }
+        });
+
+        makeRequest();
+    }
+
+    private void makeRequest()
+    {
+        textView_error.setVisibility(View.GONE);
+        button_tryAgain.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest request = new StringRequest(Request.Method.GET, requestUrl, new Response.Listener<String>()
         {
@@ -70,6 +97,10 @@ public class MainActivity extends AppCompatActivity
             {
                 Toast.makeText(MainActivity.this, "An error occured", Toast.LENGTH_LONG).show();
                 Log.e(TAG, error.getMessage());
+
+                textView_error.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+                button_tryAgain.setVisibility(View.VISIBLE);
             }
         });
 
@@ -86,23 +117,29 @@ public class MainActivity extends AppCompatActivity
             jsonArray = new JSONArray(response);
             for (int i = 0; i < jsonArray.length(); i++)
             {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                JSONObject repoJSON = jsonArray.getJSONObject(i);
 
-                String repoName = jsonObject.getString("name");
-                String url = jsonObject.getString("html_url");
-                int stars = jsonObject.getInt("watchers");
-                String description = jsonObject.getString("description");
+                String repoName = repoJSON.getString("name");
+                String url = repoJSON.getString("html_url");
+                int stars = repoJSON.getInt("watchers");
+                String description = repoJSON.getString("description");
+                String contributorsUrl = repoJSON.getString("contributors_url");
 
-                RepoData data = new RepoData(repoName, url, stars, description);
+                RepoData data = new RepoData(repoName, url, stars, description, contributorsUrl);
                 repoDataList.add(data);
                 adapter.notifyDataSetChanged();
             }
+
+            textView_error.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            button_tryAgain.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
         } catch (JSONException e)
         {
             e.printStackTrace();
+            textView_error.setVisibility(View.VISIBLE);
+            button_tryAgain.setVisibility(View.VISIBLE);
         }
-
-        progressBar.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
     }
 }
