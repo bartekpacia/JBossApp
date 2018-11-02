@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity
         adapter = new ReposRecyclerViewAdapter(this, repoDataList);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
 

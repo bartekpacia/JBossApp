@@ -68,7 +68,6 @@ public class RepositoryActivity extends AppCompatActivity
         adapter = new ContributorRecyclerViewAdapter(this, contributorDataList);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
 

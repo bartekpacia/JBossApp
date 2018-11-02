@@ -10,7 +10,7 @@
     app:cardBackgroundColor="@color/colorPrimaryDark"
     app:cardCornerRadius="8dp"
     app:cardUseCompatPadding="true"
-    app:contentPadding="@dimen/margin">
+    app:contentPadding="@dimen/normal_margin">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,8 +20,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin"
-            android:layout_marginEnd="@dimen/margin"
+            android:layout_marginStart="@dimen/normal_margin"
+            android:layout_marginEnd="@dimen/normal_margin"
             android:orientation="horizontal">
 
             <TextView
