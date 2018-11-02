@@ -5,6 +5,8 @@
     <string name="contributions">Contributions:</string>
     <string name="an_error_occurred">An error occurred! :(</string>
     <string name="try_again">Try again</string>
+    <string name="stars">Stars</string>
+    <string name="forks">Forks</string>
 
     <string name="main_description">The list of repositories under JBoss Outreach organization is
     displayed here. You can click on it to see more details about particular repository.</string>

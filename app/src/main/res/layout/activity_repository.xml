@@ -11,8 +11,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:focusableInTouchMode="true"
+        android:orientation="vertical"
         android:padding="8dp">
 
         <TextView
@@ -28,22 +28,90 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="0"
-                android:adjustViewBounds="true"
-                app:srcCompat="@mipmap/ic_star_white" />
-
-            <TextView
-                android:id="@+id/textView_starCount"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="25"
-                android:textColor="@android:color/white" />
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/layout_forks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView_forkCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="25"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp" />
+
+                    <ImageView
+                        android:id="@+id/imageView_fork"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:adjustViewBounds="false"
+                        android:cropToPadding="false"
+                        app:srcCompat="@mipmap/ic_fork" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:text="@string/forks"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_stars"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView_starCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="25"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp" />
+
+                    <ImageView
+                        android:id="@+id/imageView_star"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:adjustViewBounds="false"
+                        android:cropToPadding="false"
+                        app:srcCompat="@mipmap/ic_star_white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:text="@string/stars"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView_language"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Java"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/button_github"
@@ -55,14 +123,34 @@
                 android:textColor="@android:color/white" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/textView"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/contributors"
-            android:textAlignment="center"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="24sp" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_weight="1"
+                android:text="@string/contributors"
+                android:textAlignment="center"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/textView_contributorCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_toEndOf="@+id/textView_header"
+                android:text="(25)"
+                android:textColor="@android:color/white"
+                android:textSize="24sp" />
+        </RelativeLayout>
 
         <ProgressBar
             android:id="@+id/progressBar_contributors"
@@ -70,11 +158,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <TextView
+            android:id="@+id/textView_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/an_error_occurred"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent" />
+
+        <Button
+            android:id="@+id/button_tryAgain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="@color/colorAccent"
+            android:text="@string/try_again"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView_contributors"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

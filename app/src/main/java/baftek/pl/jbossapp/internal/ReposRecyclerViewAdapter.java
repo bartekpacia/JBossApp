@@ -31,6 +31,9 @@ public class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecycler
         CardView cardView;
         TextView textView_repoName;
         TextView textView_starCount;
+        TextView textView_forksCount;
+        TextView textView_language;
+        TextView textView_description;
 
         public ViewHolder(View itemView)
         {
@@ -38,6 +41,9 @@ public class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecycler
             cardView = itemView.findViewById(R.id.cardView);
             textView_repoName = itemView.findViewById(R.id.textView_name);
             textView_starCount = itemView.findViewById(R.id.textView_starCount);
+            textView_forksCount = itemView.findViewById(R.id.textView_forkCount);
+            textView_language = itemView.findViewById(R.id.textView_language);
+            textView_description = itemView.findViewById(R.id.textView_repoDescription);
         }
     }
 
@@ -65,6 +71,8 @@ public class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecycler
                 i.putExtra("name", repoData.getName());
                 i.putExtra("url", repoData.getUrl());
                 i.putExtra("stars", repoData.getStars());
+                i.putExtra("forks", repoData.getForks());
+                i.putExtra("language", repoData.getLanguage());
                 i.putExtra("description", repoData.getDescription());
                 i.putExtra("contributors_url", repoData.getContributorsUrl());
                 context.startActivity(i);
@@ -74,6 +82,9 @@ public class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecycler
 
         //it needs to be converted to String, otherwise framework will try to use int as ResId and exception will be thrown
         holder.textView_starCount.setText(Integer.toString(repoData.getStars()));
+        holder.textView_forksCount.setText(Integer.toString(repoData.getForks()));
+        holder.textView_language.setText(repoData.getLanguage());
+        holder.textView_description.setText(repoData.getDescription());
     }
 
     @Override

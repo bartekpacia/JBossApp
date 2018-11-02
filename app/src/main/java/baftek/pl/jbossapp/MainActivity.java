@@ -1,18 +1,11 @@
 package baftek.pl.jbossapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Context;
 import android.os.Bundle;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import baftek.pl.jbossapp.internal.ReposRecyclerViewAdapter;
-import baftek.pl.jbossapp.internal.RepoData;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -31,23 +24,27 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import baftek.pl.jbossapp.internal.RepoData;
+import baftek.pl.jbossapp.internal.ReposRecyclerViewAdapter;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "MainActivity";
 
     String requestUrl = "https://api.github.com/orgs/JBossOutreach/repos";
 
-    @BindView(R.id.progressBar_repos)
-    ProgressBar progressBar;
-    @BindView(R.id.textView_error)
-    TextView textView_error;
-    @BindView(R.id.button_tryAgain)
-    Button button_tryAgain;
-    @BindView(R.id.recyclerView_repos)
-    RecyclerView recyclerView;
+    private ArrayList<RepoData> repoDataList;
     private ReposRecyclerViewAdapter adapter;
 
-    private ArrayList<RepoData> repoDataList;
+    @BindView(R.id.progressBar_repos) ProgressBar progressBar;
+    @BindView(R.id.textView_error) TextView textView_error;
+    @BindView(R.id.button_tryAgain) Button button_tryAgain;
+    @BindView(R.id.recyclerView_repos) RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -77,9 +74,7 @@ public class MainActivity extends AppCompatActivity
 
     private void makeRequest()
     {
-        textView_error.setVisibility(View.GONE);
-        button_tryAgain.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
+        setLayoutLoading();
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest request = new StringRequest(Request.Method.GET, requestUrl, new Response.Listener<String>()
@@ -94,12 +89,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onErrorResponse(VolleyError error)
             {
+                error.printStackTrace();
                 Toast.makeText(MainActivity.this, "An error occured", Toast.LENGTH_LONG).show();
-                Log.e(TAG, error.getMessage());
-
-                textView_error.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-                button_tryAgain.setVisibility(View.VISIBLE);
+                setLayoutError();
             }
         });
 
@@ -121,24 +113,57 @@ public class MainActivity extends AppCompatActivity
                 String repoName = repoJSON.getString("name");
                 String url = repoJSON.getString("html_url");
                 int stars = repoJSON.getInt("watchers");
+                int forks = repoJSON.getInt("forks");
+                String language = repoJSON.getString("language");
                 String description = repoJSON.getString("description");
                 String contributorsUrl = repoJSON.getString("contributors_url");
 
-                RepoData data = new RepoData(repoName, url, stars, description, contributorsUrl);
+                RepoData data = new RepoData(repoName, url, stars, forks, language, description, contributorsUrl);
                 repoDataList.add(data);
-                adapter.notifyDataSetChanged();
             }
 
-            textView_error.setVisibility(View.GONE);
-            progressBar.setVisibility(View.GONE);
-            button_tryAgain.setVisibility(View.GONE);
-            progressBar.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
+            setLayoutReady();
+            runLayoutAnimation(recyclerView);
         } catch (JSONException e)
         {
             e.printStackTrace();
-            textView_error.setVisibility(View.VISIBLE);
-            button_tryAgain.setVisibility(View.VISIBLE);
+            setLayoutError();
         }
+    }
+
+    private void runLayoutAnimation(final RecyclerView recyclerView)
+    {
+        final Context context = recyclerView.getContext();
+        final LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
+
+        adapter.notifyDataSetChanged();
+        recyclerView.setLayoutAnimation(controller);
+        recyclerView.scheduleLayoutAnimation();
+    }
+
+
+    private void setLayoutLoading()
+    {
+        progressBar.setVisibility(View.VISIBLE);
+        textView_error.setVisibility(View.GONE);
+        button_tryAgain.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+    }
+
+    private void setLayoutReady()
+    {
+        progressBar.setVisibility(View.GONE);
+        textView_error.setVisibility(View.GONE);
+        button_tryAgain.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void setLayoutError()
+    {
+        progressBar.setVisibility(View.GONE);
+        textView_error.setVisibility(View.VISIBLE);
+        button_tryAgain.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
     }
 }

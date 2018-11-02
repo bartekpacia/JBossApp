@@ -1,10 +1,12 @@
 package baftek.pl.jbossapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -16,7 +18,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,22 +41,21 @@ public class RepositoryActivity extends AppCompatActivity
     private String name;
     private String url;
     private int stars;
+    private int contributions;
     private String description;
     private String contributorsUrl;
 
     List<ContributorData> contributorDataList;
     ContributorRecyclerViewAdapter adapter;
 
-    @BindView(R.id.textView_description)
-    TextView textView_description;
-    @BindView(R.id.textView_starCount)
-    TextView textView_starCount;
-    @BindView(R.id.button_github)
-    Button button_github;
-    @BindView(R.id.recyclerView_contributors)
-    RecyclerView recyclerView;
-    @BindView(R.id.progressBar_contributors)
-    ProgressBar progressBar;
+    @BindView(R.id.textView_description) TextView textView_description;
+    @BindView(R.id.textView_starCount) TextView textView_starCount;
+    @BindView(R.id.button_github) Button button_github;
+    @BindView(R.id.progressBar_contributors) ProgressBar progressBar;
+    @BindView(R.id.textView_error) TextView textView_error;
+    @BindView(R.id.button_tryAgain) Button button_tryAgain;
+    @BindView(R.id.recyclerView_contributors) RecyclerView recyclerView;
+    @BindView(R.id.textView_contributorCount) TextView textView_contributorCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -63,7 +63,8 @@ public class RepositoryActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_repository);
         ButterKnife.bind(this);
-        processBundleData();
+        getDataFromBundle();
+        makeRequest();
 
         adapter = new ContributorRecyclerViewAdapter(this, contributorDataList);
 
@@ -83,10 +84,44 @@ public class RepositoryActivity extends AppCompatActivity
             }
         });
 
+        button_tryAgain.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                makeRequest();
+            }
+        });
+
         getSupportActionBar().setTitle(name);
     }
 
-    private void processBundleData()
+    private void makeRequest()
+    {
+        setLayoutLoading();
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest request = new StringRequest(Request.Method.GET, contributorsUrl, new Response.Listener<String>()
+        {
+            @Override
+            public void onResponse(String response)
+            {
+                processResponse(response);
+            }
+        }, new Response.ErrorListener()
+        {
+            @Override
+            public void onErrorResponse(VolleyError error)
+            {
+                error.printStackTrace();
+                Toast.makeText(RepositoryActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                setLayoutError();
+            }
+        });
+        requestQueue.add(request);
+    }
+
+    private void getDataFromBundle()
     {
         contributorDataList = new ArrayList<>();
 
@@ -95,27 +130,7 @@ public class RepositoryActivity extends AppCompatActivity
         url = bundle.getString("url");
         stars = bundle.getInt("stars");
         description = bundle.getString("description");
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
         contributorsUrl = bundle.getString("contributors_url");
-        StringRequest request = new StringRequest(Request.Method.GET, contributorsUrl, new Response.Listener<String>()
-        {
-            @Override
-            public void onResponse(String response)
-            {
-                Toast.makeText(RepositoryActivity.this, "Download successful", Toast.LENGTH_SHORT).show();
-                processResponse(response);
-            }
-        }, new Response.ErrorListener()
-        {
-            @Override
-            public void onErrorResponse(VolleyError error)
-            {
-                Log.e(TAG, error.getMessage());
-                Toast.makeText(RepositoryActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
-            }
-        });
-        requestQueue.add(request);
     }
 
     private void processResponse(String response)
@@ -123,6 +138,7 @@ public class RepositoryActivity extends AppCompatActivity
         try
         {
             JSONArray jsonArray = new JSONArray(response);
+            contributions = jsonArray.length();
 
             for (int i = 0; i < jsonArray.length(); i++)
             {
@@ -135,13 +151,54 @@ public class RepositoryActivity extends AppCompatActivity
                 ContributorData contributorData = new ContributorData(login, avatarUrl, githubProfileUrl, contributions);
                 contributorDataList.add(contributorData);
             }
+
+            setLayoutReady();
+            runLayoutAnimation(recyclerView);
         } catch (JSONException e)
         {
-            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
+            setLayoutError();
         }
+    }
+
+    private void runLayoutAnimation(final RecyclerView recyclerView)
+    {
+        final Context context = recyclerView.getContext();
+        final LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
 
         adapter.notifyDataSetChanged();
+        recyclerView.setLayoutAnimation(controller);
+        recyclerView.scheduleLayoutAnimation();
+    }
+
+
+    private void setLayoutLoading()
+    {
+        progressBar.setVisibility(View.VISIBLE);
+        textView_error.setVisibility(View.GONE);
+        button_tryAgain.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+        textView_contributorCount.setVisibility(View.INVISIBLE);
+    }
+
+    private void setLayoutReady()
+    {
+        textView_contributorCount.setText("(" + Integer.toString(contributions) + ")");
+
         progressBar.setVisibility(View.GONE);
+        textView_error.setVisibility(View.GONE);
+        button_tryAgain.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
+        textView_contributorCount.setVisibility(View.VISIBLE);
+    }
+
+    private void setLayoutError()
+    {
+        progressBar.setVisibility(View.GONE);
+        textView_error.setVisibility(View.VISIBLE);
+        button_tryAgain.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        textView_contributorCount.setVisibility(View.INVISIBLE);
     }
 }
