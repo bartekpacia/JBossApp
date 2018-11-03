@@ -51,7 +51,7 @@ public class ContributorRecyclerViewAdapter extends RecyclerView.Adapter<Contrib
     @Override
     public ContributorRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_contributors, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_contributor, parent, false);
         final ContributorRecyclerViewAdapter.ViewHolder holder = new ContributorRecyclerViewAdapter.ViewHolder(view);
 
         return holder;

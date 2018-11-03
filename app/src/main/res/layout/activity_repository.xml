@@ -21,7 +21,14 @@
             android:layout_height="wrap_content"
             android:text="TextView"
             android:textAlignment="center"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@android:color/darker_gray"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/divider_1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -99,8 +106,14 @@
                         android:text="@string/stars"
                         android:textColor="@android:color/white"
                         android:textSize="17sp" />
-
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textView_license"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="license"
+                    android:textColor="@android:color/white" />
             </LinearLayout>
 
             <TextView
@@ -123,34 +136,34 @@
                 android:textColor="@android:color/white" />
         </LinearLayout>
 
-        <RelativeLayout
+        <View
+            android:id="@+id/divider_2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
 
-            <TextView
-                android:id="@+id/textView_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_weight="1"
-                android:text="@string/contributors"
-                android:textAlignment="center"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="24sp" />
+        <TextView
+            android:id="@+id/textView_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="1"
+            android:text="@string/contributors"
+            android:textAlignment="center"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="24sp" />
 
-            <TextView
-                android:id="@+id/textView_contributorCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_toEndOf="@+id/textView_header"
-                android:text="(25)"
-                android:textColor="@android:color/white"
-                android:textSize="24sp" />
-        </RelativeLayout>
+        <TextView
+            android:id="@+id/textView_contributorLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_toEndOf="@+id/textView_header"
+            android:paddingStart="@dimen/standard_padding"
+            android:text="25 people"
+            android:textColor="@android:color/white" />
 
         <ProgressBar
             android:id="@+id/progressBar_contributors"

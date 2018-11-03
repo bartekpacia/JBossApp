@@ -50,7 +50,7 @@ public class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecycler
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_repos, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_repository, parent, false);
         final ViewHolder holder = new ViewHolder(view);
 
         return holder;
@@ -67,6 +67,7 @@ public class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecycler
             @Override
             public void onClick(View v)
             {
+                //TODO Refactor to use Bundle and Parcelable
                 Intent i = new Intent(context, RepositoryActivity.class);
                 i.putExtra("name", repoData.getName());
                 i.putExtra("url", repoData.getUrl());
@@ -75,6 +76,7 @@ public class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecycler
                 i.putExtra("language", repoData.getLanguage());
                 i.putExtra("description", repoData.getDescription());
                 i.putExtra("contributors_url", repoData.getContributorsUrl());
+                i.putExtra("license", repoData.getLicense());
                 context.startActivity(i);
             }
         });

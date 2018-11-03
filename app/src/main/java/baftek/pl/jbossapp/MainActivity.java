@@ -35,7 +35,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "MainActivity";
-
+    
     String requestUrl = "https://api.github.com/orgs/JBossOutreach/repos";
 
     private ArrayList<RepoData> repoDataList;
@@ -72,6 +72,9 @@ public class MainActivity extends AppCompatActivity
         makeRequest();
     }
 
+    /**
+     * Creates a request to get necessary data.
+     */
     private void makeRequest()
     {
         setLayoutLoading();
@@ -98,6 +101,10 @@ public class MainActivity extends AppCompatActivity
         requestQueue.add(request);
     }
 
+    /**
+     * Processes a response so everything is setup and ready
+     * @param response Response got when {@link MainActivity#makeRequest()} completes with a success
+     */
     private void processResponse(String response)
     {
         Log.d(TAG, "Got response!");
@@ -118,7 +125,20 @@ public class MainActivity extends AppCompatActivity
                 String description = repoJSON.getString("description");
                 String contributorsUrl = repoJSON.getString("contributors_url");
 
-                RepoData data = new RepoData(repoName, url, stars, forks, language, description, contributorsUrl);
+                //Obtaining license
+                String license;
+                if (repoJSON.get("license") != JSONObject.NULL)
+                {
+                    JSONObject licenseJSON = repoJSON.getJSONObject("license");
+                    license = licenseJSON.getString("name");
+                }
+                else
+                {
+                    license = getString(R.string.no_license);
+                }
+
+                //Creating RepoData and adding to ArrayList
+                RepoData data = new RepoData(repoName, url, stars, forks, language, description, contributorsUrl, license);
                 repoDataList.add(data);
             }
 
@@ -142,7 +162,9 @@ public class MainActivity extends AppCompatActivity
         recyclerView.scheduleLayoutAnimation();
     }
 
-
+    /**
+     * Invoke this when data is being loaded. Displays progress bar.
+     */
     private void setLayoutLoading()
     {
         progressBar.setVisibility(View.VISIBLE);
@@ -151,6 +173,9 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setVisibility(View.GONE);
     }
 
+    /**
+     * Invoke this when everything is OK. Displays complete, ready-to-use layout.
+     */
     private void setLayoutReady()
     {
         progressBar.setVisibility(View.GONE);
@@ -159,6 +184,9 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Invoke this when everything something went wrong. Displays error message and Try Again button.
+     */
     private void setLayoutError()
     {
         progressBar.setVisibility(View.GONE);

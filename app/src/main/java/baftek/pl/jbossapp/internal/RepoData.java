@@ -1,5 +1,6 @@
 package baftek.pl.jbossapp.internal;
 
+//TODO Implement Parcelable
 public class RepoData
 {
     private String name;
@@ -9,8 +10,9 @@ public class RepoData
     private String language;
     private String description;
     private String contributorsUrl;
+    private String license;
 
-    public RepoData(String name, String url, int stars, int forks, String language, String description, String contributorsUrl)
+    public RepoData(String name, String url, int stars, int forks, String language, String description, String contributorsUrl, String license)
     {
         this.name = name;
         this.url = url;
@@ -19,6 +21,7 @@ public class RepoData
         this.language = language;
         this.description = description;
         this.contributorsUrl = contributorsUrl;
+        this.license = license;
 
         //avoid nulls
         if (this.language.equals("null"))
@@ -65,5 +68,10 @@ public class RepoData
     public String getContributorsUrl()
     {
         return contributorsUrl;
+    }
+
+    public String getLicense()
+    {
+        return license;
     }
 }
