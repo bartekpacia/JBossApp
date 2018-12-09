@@ -11,4 +11,8 @@
     <string name="no_license">No license</string>
     <string name="main_description">The list of repositories under JBoss Outreach organization is
     displayed here. You can click on it to see more details about particular repository.</string>
+    <string name="top_contributors">Top contributors</string>
+    <string name="top_contributors_description">These guys contributed the most</string>
+    <string name="contributors_description">All awesome people who helped to develop and maintain this project.</string>
+    <string name="overview">Overview</string>
 </resources>
