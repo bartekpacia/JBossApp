@@ -34,4 +34,10 @@ public class ContributorData
     {
         return contributions;
     }
+
+    @Override
+    public String toString()
+    {
+        return "Login: " + login + ", avatarUrl: " + avatarUrl + ", githubProfileUrl: " + githubProfileUrl + ", contributions: " + contributions;
+    }
 }

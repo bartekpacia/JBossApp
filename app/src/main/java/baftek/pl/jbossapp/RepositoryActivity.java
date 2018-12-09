@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,14 +44,16 @@ public class RepositoryActivity extends AppCompatActivity
     private String url;
     private int stars;
     private int forks;
-    private int contributors;
+    private int allContributorsCount;
     private String language;
     private String description;
     private String contributorsUrl;
     private String license;
 
-    List<ContributorData> contributorDataList;
-    ContributorRecyclerViewAdapter adapter;
+    List<ContributorData> topContributorDataList;
+    ContributorRecyclerViewAdapter topAdapter;
+    List<ContributorData> restContributorDataList;
+    ContributorRecyclerViewAdapter restAdapter;
 
     @BindView(R.id.textView_description) TextView textView_description;
     @BindView(R.id.textView_starCount) TextView textView_starCount;
@@ -59,9 +63,13 @@ public class RepositoryActivity extends AppCompatActivity
     @BindView(R.id.progressBar_contributors) ProgressBar progressBar;
     @BindView(R.id.textView_error) TextView textView_error;
     @BindView(R.id.button_tryAgain) Button button_tryAgain;
-    @BindView(R.id.recyclerView_contributors) RecyclerView recyclerView;
-    @BindView(R.id.textView_contributorLabel) TextView textView_contributorLabel;
+    @BindView(R.id.recyclerView_topContributors) RecyclerView topRecyclerView;
+    @BindView(R.id.recyclerView_restOfontributors) RecyclerView restRecyclerView;
+    @BindView(R.id.textView_contributorCount) TextView textView_contributorLabel;
     @BindView(R.id.textView_license) TextView textView_license;
+
+    @BindView(R.id.content_layout) LinearLayout contentLayout;
+    @BindView(R.id.error_layout) LinearLayout errorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -72,11 +80,17 @@ public class RepositoryActivity extends AppCompatActivity
         getDataFromBundle();
         makeRequest();
 
-        adapter = new ContributorRecyclerViewAdapter(this, contributorDataList);
+        topAdapter = new ContributorRecyclerViewAdapter(this, topContributorDataList);
+        topAdapter.setShowPosition(true);
+        restAdapter = new ContributorRecyclerViewAdapter(this, restContributorDataList);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(adapter);
+        topRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        topRecyclerView.setHasFixedSize(true);
+        topRecyclerView.setAdapter(topAdapter);
+
+        restRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        restRecyclerView.setHasFixedSize(true);
+        restRecyclerView.setAdapter(restAdapter);
 
         textView_description.setText(description);
         textView_starCount.setText(Integer.toString(stars));
@@ -106,7 +120,7 @@ public class RepositoryActivity extends AppCompatActivity
     }
 
     /**
-     * Creates a request to get additional data needed in this acivity, such as contributors (to this
+     * Creates a request to get additional data needed in this acivity, such as allContributorsCount (to this
      * specific repository)
      */
     private void makeRequest()
@@ -139,7 +153,8 @@ public class RepositoryActivity extends AppCompatActivity
      */
     private void getDataFromBundle()
     {
-        contributorDataList = new ArrayList<>();
+        topContributorDataList = new ArrayList<>();
+        restContributorDataList = new ArrayList<>();
 
         Bundle bundle = getIntent().getExtras();
         name = bundle.getString("name");
@@ -154,6 +169,7 @@ public class RepositoryActivity extends AppCompatActivity
 
     /**
      * Processes a response so everything is setup and ready
+     *
      * @param response Response got when {@link RepositoryActivity#makeRequest()} completes with a success
      */
     private void processResponse(String response)
@@ -161,9 +177,9 @@ public class RepositoryActivity extends AppCompatActivity
         try
         {
             JSONArray jsonArray = new JSONArray(response);
-            contributors = jsonArray.length();
+            allContributorsCount = jsonArray.length();
 
-            for (int i = 0; i < jsonArray.length(); i++)
+            for (int i = 0; i < allContributorsCount; i++)
             {
                 JSONObject contributorJSON = jsonArray.getJSONObject(i);
                 String login = contributorJSON.getString("login");
@@ -172,26 +188,57 @@ public class RepositoryActivity extends AppCompatActivity
                 int contributions = contributorJSON.getInt("contributions");
 
                 ContributorData contributorData = new ContributorData(login, avatarUrl, githubProfileUrl, contributions);
-                contributorDataList.add(contributorData);
+                restContributorDataList.add(contributorData);
+            }
+
+            /*  Get first 3 contributors and place them in topContributorDataList
+                We're removing only 0 indexes, because after deletion the old 1 is now 0 :)
+             */
+            for (int i = 0; i < 3; i++)
+            {
+                // Get first element
+                ContributorData data = restContributorDataList.get(0);
+
+                // Add that element to the List of Top Contributors
+                topContributorDataList.add(data);
+
+                // Remove the Top Contributor from List of Rest Contributors
+                restContributorDataList.remove(0);
+            }
+
+            // Print top contributors to logcat
+            for (ContributorData data : topContributorDataList)
+            {
+                Log.d(TAG + " TOP", data.toString());
+            }
+
+            // Print rest of contributors to logcat
+            for (ContributorData data : restContributorDataList)
+            {
+                Log.d(TAG + " REST", data.toString());
             }
 
             setLayoutReady();
-            runLayoutAnimation(recyclerView);
+            runLayoutAnimation(topRecyclerView);
+            runLayoutAnimation(restRecyclerView);
         } catch (JSONException e)
         {
             e.printStackTrace();
             setLayoutError();
         }
     }
-
-
+    
+    /**
+     * Runs layout animation for items in the RecyclerView (passed as argument)
+     * @param recyclerView RecyclerView for which the animation should be run
+     */
     private void runLayoutAnimation(final RecyclerView recyclerView)
     {
         final Context context = recyclerView.getContext();
         final LayoutAnimationController controller =
                 AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down);
 
-        adapter.notifyDataSetChanged();
+        recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.setLayoutAnimation(controller);
         recyclerView.scheduleLayoutAnimation();
     }
@@ -202,10 +249,9 @@ public class RepositoryActivity extends AppCompatActivity
     private void setLayoutLoading()
     {
         progressBar.setVisibility(View.VISIBLE);
-        textView_error.setVisibility(View.GONE);
-        button_tryAgain.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.GONE);
-        textView_contributorLabel.setVisibility(View.INVISIBLE);
+        errorLayout.setVisibility(View.GONE);
+
+        contentLayout.setVisibility(View.GONE);
     }
 
     /**
@@ -213,13 +259,11 @@ public class RepositoryActivity extends AppCompatActivity
      */
     private void setLayoutReady()
     {
-        textView_contributorLabel.setText(contributors + " " + getString(R.string.people_contributing));
-
+        textView_contributorLabel.setText(String.valueOf(allContributorsCount));
         progressBar.setVisibility(View.GONE);
-        textView_error.setVisibility(View.GONE);
-        button_tryAgain.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
-        textView_contributorLabel.setVisibility(View.VISIBLE);
+        errorLayout.setVisibility(View.GONE);
+
+        contentLayout.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -228,9 +272,8 @@ public class RepositoryActivity extends AppCompatActivity
     private void setLayoutError()
     {
         progressBar.setVisibility(View.GONE);
-        textView_error.setVisibility(View.VISIBLE);
-        button_tryAgain.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.GONE);
-        textView_contributorLabel.setVisibility(View.INVISIBLE);
+        errorLayout.setVisibility(View.VISIBLE);
+
+        contentLayout.setVisibility(View.GONE);
     }
 }

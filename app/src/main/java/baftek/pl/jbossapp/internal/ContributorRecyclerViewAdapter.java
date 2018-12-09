@@ -2,6 +2,7 @@ package baftek.pl.jbossapp.internal;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ public class ContributorRecyclerViewAdapter extends RecyclerView.Adapter<Contrib
 {
     private List<ContributorData> contributorDataList;
     private Context context;
+    private boolean showPosition;
 
     public ContributorRecyclerViewAdapter(Context context, List<ContributorData> contributorDataList)
     {
@@ -36,6 +38,7 @@ public class ContributorRecyclerViewAdapter extends RecyclerView.Adapter<Contrib
         TextView textView_login;
         TextView textView_contributionCount;
         Button button_seeOnGitHub;
+        TextView textView_place;
 
         public ViewHolder(View itemView)
         {
@@ -45,6 +48,8 @@ public class ContributorRecyclerViewAdapter extends RecyclerView.Adapter<Contrib
             textView_login = itemView.findViewById(R.id.textView_login);
             textView_contributionCount = itemView.findViewById(R.id.textView_contributionCount);
             button_seeOnGitHub = itemView.findViewById(R.id.button_githubProfile);
+            textView_place = itemView.findViewById(R.id.textView_place);
+            textView_place.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -79,11 +84,44 @@ public class ContributorRecyclerViewAdapter extends RecyclerView.Adapter<Contrib
                 context.startActivity(intent);
             }
         });
+
+        if (showPosition)
+        {
+            int fixedPosition = position + 1;
+            holder.textView_place.setVisibility(View.VISIBLE);
+            holder.textView_place.setText(String.valueOf(fixedPosition));
+
+            switch (fixedPosition){
+                case 1:
+                    holder.cardView.setCardBackgroundColor(Color.parseColor("#E4CD24"));
+                    break;
+                case 2:
+                    holder.cardView.setCardBackgroundColor(Color.parseColor("#E4BE24"));
+                    break;
+                case 3:
+                    holder.cardView.setCardBackgroundColor(Color.parseColor("#DCA328"));
+                    break;
+            }
+        }
     }
 
     @Override
     public int getItemCount()
     {
         return contributorDataList.size();
+    }
+
+    public boolean isShowPosition()
+    {
+        return showPosition;
+    }
+
+    /**
+     * Shows a big number on the right side of this view. The number can be 1, 2 or 3 (podium numbers).
+     * The background color of the card will be changed to reflect contributor's position on the podium.
+     */
+    public void setShowPosition(boolean showPosition)
+    {
+        this.showPosition = showPosition;
     }
 }
